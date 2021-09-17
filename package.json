@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "echo \"Error: no test specified\" && exit 1",
+    "serve": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +29,7 @@
     "sequelize-auto-migrations": "^1.0.3"
   },
   "devDependencies": {
+    "nodemon": "^2.0.12",
     "sequelize-cli": "^6.2.0"
   }
 }

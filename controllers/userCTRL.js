@@ -68,7 +68,7 @@ exports.login = (req, res, next) => {
               { expiresIn: '24h' }
             )});
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => res.status(500).json({  error }));
     })
     .catch(error => res.status(500).json({ error }));
 };
@@ -90,10 +90,10 @@ exports.name = (req, res, next) => {
 
   const userId = utilsToken.getId(req)
 
-  User.findOne({
-    where: { id: userId}
-  })
-    .then((user) => {
-      res.status(200).json(user);
-    })  
+      User.findOne({
+        where: { id: userId}
+      })
+      .then((user) => {
+        res.status(200).json(user);
+      })  
 }

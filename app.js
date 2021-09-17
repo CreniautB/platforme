@@ -27,12 +27,17 @@ app.use(apiLimiter);
 // Réduit le risque d'attaque Ssl 
 app.use(helmet());
 
+const fileupload = require("express-fileupload");
+app.use(fileupload());
+
+
 app.use(express.json());       
 app.use(express.urlencoded({extended:false}));
    
 require('./routes/user.js')(app);
 require('./routes/miniJeux.js')(app);
-
+require('./routes/avi.js')(app);
+require('./routes/anion.js')(app);
 db.sequelize.sync();
 
 module.exports = app;

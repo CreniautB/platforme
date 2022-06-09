@@ -25,15 +25,10 @@ module.exports = (sequelize, Datatypes) => {
             type: Datatypes.STRING,
             allowNull: false,
             defaultValue: "user"
-        },
-        role2: {
-            type: Datatypes.STRING,
-            allowNull: false,
-            defaultValue: "user"
-        },
+        }
     });
     User.associate = (models) => {
-
+        User.hasMany(models.Appli)
     };
     return User;
 }

@@ -1,7 +1,7 @@
 const fs = require('fs')
 const { exec } = require('child_process');
 
-const mailgun = require("mailgun-js");
+const nodemailer = require('nodemailer');
 
 
 exports.anion = (req,res, next) => {
@@ -41,7 +41,7 @@ exports.anion = (req,res, next) => {
 
                 for (i = 1; i < (files.length - 1); i++) {
 
-                    exec(`ffmpeg -i ${'public/videoSourceAnion/'+req.params.id+'/'+`${i}`+'.webm'} -i ${directoryPath+'/webCam'+i+'.webm'} -filter_complex "[0:v]scale=10:5,setsar=1[l];[1:v]scale=10:5,setsar=1[r];[l][r]hstack;[0][1]amix" -async 0  ${directoryPathVideo+'/webCam'+i+'.webm'} `, (error, stdout, stderr) => {
+                    exec(`ffmpeg -i ${'public/videoSourceAnion/'+req.params.id+'/'+`${i}`+'.webm'} -i ${directoryPath+'/webCam'+i+'.webm'} -filter_complex "[0:v]scale=320:240,setsar=1[l];[1:v]scale=320:240,setsar=1[r];[l][r]hstack;[0][1]amix" -async 0  ${directoryPathVideo+'/webCam'+i+'.webm'} `, (error, stdout, stderr) => {
                         if (error) {
                             console.log(`error: ${error.message}`);
                         }
@@ -78,30 +78,49 @@ exports.anion = (req,res, next) => {
                         console.log(`error: ${error.message}`);
                         return;
                     }
-                else{
-                    res.download(`${directoryPathFinal+'finalOutput.webm'}` ,(err) => {
-                        if(err) throw err
-
-                        const DOMAIN = "sandbox0a9deb84a69f456f95a3ccfc7cb0cec2.mailgun.org";
-                        const mg = mailgun({apiKey: "eb86d0963b570e22bf09bf6eb88c6130-90346a2d-fc6d1071", domain: DOMAIN});
-                        const data = {
-                            from: "Mailgun Sandbox <postmaster@sandbox0a9deb84a69f456f95a3ccfc7cb0cec2.mailgun.org>",
-                            to: "creniaut.benjamin@gmail.com",
-                            subject: "Hello",
-                            text: "Testing some Mailgun awesomness!",
-                            attachment : `${directoryPathFinal+'finalOutput.webm'}`
-                        };
+                    else{
+                        const transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                user: 'test.benjamin.creniaut@gmail.com',
+                                pass: 'testBenjamin123!'
+                            }
+                            });
+                            
+                        const mailOptions = {
+                            from: 'test.benjamin.creniaut@gmail.com',
+                            to: 'creniaut.benjamin@gmail.com',
+                            subject: 'Sending Email using Node.js',
+                            text: 'That was easy!',
+                            attachments: [
+                                    {   // utf-8 string as an attachment
+                                        filename: 'video.webm',
+                                        content: `${directoryPathFinal+'finalOutput.webm'}`,
+                                    },
+                                ]
+                            };
+                        
+                        transporter.sendMail(mailOptions, function(error, info){
+                            
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                            fs.rmSync(`public/video/${req.body.idUser}`, { recursive: true });
+                            fs.rmSync(`public/output/${req.body.idUser}`, { recursive: true });
+                            fs.rmSync(`public/uploads/${req.body.idUser}`, { recursive: true });
+                        }
+                        });
+    
                         mg.messages().send(data, function (error, body) {
                             if (error) {console.log(error)}
                             else{
-                                fs.rmSync(`public/anion/video/${req.body.idUser}`, { recursive: true });
-                                fs.rmSync(`public/anion/output/${req.body.idUser}`, { recursive: true });
-                                fs.rmSync(`public/anion/uploads/${req.body.idUser}`, { recursive: true });
+                                fs.rmSync(`public/video/${req.body.idUser}`, { recursive: true });
+                                fs.rmSync(`public/output/${req.body.idUser}`, { recursive: true });
+                                fs.rmSync(`public/uploads/${req.body.idUser}`, { recursive: true });
                                 console.log("message send")
                             }
                         });
-                        })                
-
                     }
                 })
             })

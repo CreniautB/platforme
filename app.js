@@ -35,9 +35,10 @@ app.use(express.json());
 app.use(express.urlencoded({extended:false}));
    
 require('./routes/user.js')(app);
-require('./routes/miniJeux.js')(app);
 require('./routes/avi.js')(app);
 require('./routes/anion.js')(app);
+require('./routes/appli.js')(app);
+
 db.sequelize.sync();
 
 module.exports = app;
